@@ -46,7 +46,7 @@ app.get('/getproduct/:id', async (req, res) => {
       console.error("Error fetching product:", error);
       res.status(500).json({ message: "Error fetching product" });
     }
-  });
+});
 
 
 app.post('/createProduct', async (req,res)=>{
@@ -55,6 +55,26 @@ app.post('/createProduct', async (req,res)=>{
         res.status(200).json(prod);
     }catch(error){
         res.status(500).json({message: error.message});
+    }
+});
+
+
+//update a Product
+
+app.put('/updateproduct/:id', async (req, res) => {
+    try {
+      const id = req.params.id; // Directly access the ID parameter
+      const product = await Product.findOneAndUpdate({id}, req.body);
+  
+      if (!product) {
+        console.log("Product not found!");
+        return res.status(404).json({ message: "Product not found! Make sure you entered the ID correctly" });
+      }
+  
+      res.status(200).json(product); // Return the updated product from findOneAndUpdate
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ message: "Error updating product" });
     }
 });
 
