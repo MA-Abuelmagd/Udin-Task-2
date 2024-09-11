@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose');
 const app = express()
 const Product = require('./models/product.model.js');
+const { body, param, validationResult } = require('express-validator');
 
 app.use(express.json())
 
@@ -22,6 +23,27 @@ app.get('/',(req,res)=>{
     res.send("Hello Udin Technical Test")
 });
 
+// Validation middleware for product ID
+const validateProductId = [
+    param('id').isInt({ gt: 0 }).notEmpty().withMessage('Product ID must be a positive integer')
+];
+
+// Validation middleware for product creation
+const validateProductBodyForCreatingProduct = [
+    body('id').isInt({ gt: 0 }).withMessage('Product ID must be a positive integer'),
+    body('name').isString().notEmpty().withMessage('Product name is required and should be a string'),
+    body('price').isFloat({ gt: 0 }).notEmpty().withMessage('Price must be a positive number'),
+    body('quantity').isInt({ gt: 0 }).notEmpty().withMessage('Price must be a positive number')
+];
+
+const validateProductBody=[
+    body('name').isString().optional().withMessage('Product name is required and should be a string'),
+    body('price').isFloat({ gt: 0 }).optional().withMessage('Price must be a positive number'),
+    body('quantity').isInt({ gt: 0 }).optional().withMessage('Price must be a positive number')
+]
+
+
+
 app.get('/getall',async (req,res)=>{
     try{
         const products = await Product.find({});
@@ -31,7 +53,11 @@ app.get('/getall',async (req,res)=>{
     }
 })
 
-app.get('/getproduct/:id', async (req, res) => {
+app.get('/getproduct/:id',validateProductId, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
       const id = req.params.id;
       const product = await Product.findOne({id});
@@ -49,7 +75,11 @@ app.get('/getproduct/:id', async (req, res) => {
 });
 
 
-app.post('/createProduct', async (req,res)=>{
+app.post('/createProduct', validateProductBodyForCreatingProduct, async (req,res)=>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try{
         const prod = await Product.create(req.body);
         res.status(200).json(prod);
@@ -61,7 +91,11 @@ app.post('/createProduct', async (req,res)=>{
 
 //update a Product
 
-app.put('/updateproduct/:id', async (req, res) => {
+app.put('/updateproduct/:id', validateProductId, validateProductBody, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
       const id = req.params.id; // Directly access the ID parameter
       const product = await Product.findOneAndUpdate({id}, req.body);
@@ -79,7 +113,11 @@ app.put('/updateproduct/:id', async (req, res) => {
 
 //delete a Product
 
-app.delete('/deleteproduct/:id', async (req, res) => {
+app.delete('/deleteproduct/:id', validateProductId, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
       const id = req.params.id;
       const product = await Product.findOneAndDelete({id});
