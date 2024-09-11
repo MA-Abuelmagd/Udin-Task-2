@@ -67,7 +67,6 @@ app.put('/updateproduct/:id', async (req, res) => {
       const product = await Product.findOneAndUpdate({id}, req.body);
   
       if (!product) {
-        console.log("Product not found!");
         return res.status(404).json({ message: "Product not found! Make sure you entered the ID correctly" });
       }
   
@@ -78,3 +77,20 @@ app.put('/updateproduct/:id', async (req, res) => {
     }
 });
 
+//delete a Product
+
+app.delete('/deleteproduct/:id', async (req, res) => {
+    try {
+      const id = req.params.id;
+      const product = await Product.findOneAndDelete({id});
+  
+      if (!product) {
+        return res.status(404).json({ message: "Product not found! Make sure you entered the ID correctly" });
+      }
+  
+      res.status(200).json({message: "Product Deleted Successfully"}); 
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ message: "Error updating product" });
+    }
+});
