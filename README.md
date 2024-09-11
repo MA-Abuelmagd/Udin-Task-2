@@ -35,3 +35,10 @@ The following endpoints are available:
 - **POST /createProduct**: Creates a new product. The request body must include id, name, price, and quantity.
 - **PUT /updateproduct/**: Updates a product by its ID. The request body can include name, price, and quantity (optional).
 - **DELETE /deleteproduct/**: Deletes a product by its ID.
+
+### API Testing
+The API endpoint unit testing uses **Jasmine** library for the testing.
+To start the tests:
+```npm
+npm test
+```
