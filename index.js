@@ -103,8 +103,8 @@ app.put('/updateproduct/:id', validateProductId, validateProductBody, async (req
       if (!product) {
         return res.status(404).json({ message: "Product not found! Make sure you entered the ID correctly" });
       }
-  
-      res.status(200).json(product); // Return the updated product from findOneAndUpdate
+      const updatedProduct = await Product.findOne({id});
+      res.status(200).json(updatedProduct); // Return the updated product from findOneAndUpdate
     } catch (error) {
       console.error("Error updating product:", error);
       res.status(500).json({ message: "Error updating product" });
@@ -133,4 +133,4 @@ app.delete('/deleteproduct/:id', validateProductId, async (req, res) => {
     }
 });
 
-module.export = app
+module.exports.default = app;
